@@ -6,29 +6,34 @@ const destination = "rHaPvrQ1QAhZ1RuvXwQQ23Bdk9sNVtcTUi";
 
 async function transaction(){
     await client.connect();
-    console.log("connect complete!")
+    console.log("connect complete!");
 
     //transaction
-    const sender = Wallet.fromSeed(faucetSeed) //initialize senderSeed
+    const sender = Wallet.fromSeed(faucetSeed); //initialize senderSeed
     
-    const tx = { //what is this code for?
-        TransactionType: "Payment",
-        Account: sender.classicAddress, //what is an classicAddress?
-        Destination: destination,
-        Amount: "1000000" //1xrp 
-    };
+    try{
+        const tx = {
+            TransactionType: "Payment",
+            Account: sender.classicAddress,
+            Destination: destination,
+            Amount: "1000000" //1xrp 
+        };
 
-    //ここが署名？
-    const prepared = await client.autofill(tx);
-    const signed = sender.sign(prepared);
-    const result = await clienet.sublitAndWait(signed.tx_blob);
+        //トランザクションの自動補完・署名・送信
+        const prepared = await client.autofill(tx);
+        const signed = sender.sign(prepared);
+        const result1 = await client.submitAndWait(signed.tx_blob);
+    
+        //result
+        console.log("Transaction result: ", result1.result.meta.TransactionResult);
 
-    //result
-    console.log("Transaction result: ", result.result.meta.TransactionResult);
-
+    } catch (error){
+        console.log(error.message);
+    }
+    
     //disconnect
     await client.disconnect();
-    console.log("disconnected")
+    console.log("disconnected");
 
 }
 transaction();
